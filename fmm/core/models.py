@@ -26,7 +26,12 @@ class TradeSetup:
         ):
             value = getattr(self, name)
             if isinstance(value, str):
-                object.__setattr__(self, name, float(value) if value else None)
+                if value:
+                    object.__setattr__(self, name, float(value))
+                elif name == "take_profit_pips":
+                    object.__setattr__(self, name, None)
+                else:
+                    object.__setattr__(self, name, 0.0)
 
 
 @dataclass
