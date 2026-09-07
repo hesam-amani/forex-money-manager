@@ -70,7 +70,8 @@ def compute_trade(setup: TradeSetup) -> tuple[CalculationResult, list[str]]:
         risk_amount=round(risk_amount, 2),
         pip_value=round(pip_value, 2),
         position_size=round(position_size, 6),
-        rr_ratio=round(rr_ratio, 2) if rr_ratio is not None else None,
+        # Keep the full ratio for the visual bar. The UI formats it to 2 decimals.
+        rr_ratio=rr_ratio,
         potential_profit=round(potential_profit, 2)
         if potential_profit is not None
         else None,
