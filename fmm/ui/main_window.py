@@ -6,37 +6,17 @@ from datetime import datetime
 
 from PySide6.QtCore import Qt  # pyright: ignore[reportMissingImports]
 from PySide6.QtWidgets import (
-    QApplication,
-    QDoubleSpinBox,
-    QFrame,
-    QGridLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QHeaderView,
-    QLabel,
-    QMainWindow,
-    QMessageBox,
-    QPushButton,
-    QSizePolicy,
-    QSplitter,
-    QStatusBar,
-    QTableWidget,
-    QTableWidgetItem,
-    QToolTip,
-    QVBoxLayout,
+    QApplication, QDoubleSpinBox, QFrame, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QMainWindow, QMessageBox, QPushButton, QSizePolicy,
+    QSplitter, QStatusBar, QTableWidget, QTableWidgetItem, QToolTip, QVBoxLayout,
     QWidget,
 )
 
 from ..config.settings import AppSettings
 from ..core.calculator import compute_trade
 from ..core.constants import (
-    APP_NAME,
-    APP_VERSION,
-    DEFAULT_BALANCE,
-    DEFAULT_PIP_VALUE_PER_LOT,
-    DEFAULT_RISK_PCT,
-    DEFAULT_STOP_LOSS_PIPS,
-    DEFAULT_TAKE_PROFIT_PIPS,
+    APP_NAME, APP_VERSION, DEFAULT_BALANCE, DEFAULT_PIP_VALUE_PER_LOT,
+    DEFAULT_RISK_PCT, DEFAULT_STOP_LOSS_PIPS, DEFAULT_TAKE_PROFIT_PIPS,
 )
 from ..core.models import HistoryEntry, TradeSetup
 from ..services.storage import StorageService
@@ -53,11 +33,9 @@ class MainWindow(QMainWindow):
         self._storage = StorageService()
         self._history = self._storage.load_history()
         self._tp_user_edited = False
-
         tooltip_font = QApplication.font()
         tooltip_font.setPointSize(12)
         QToolTip.setFont(tooltip_font)
-
         self._build_ui()
         self._load_settings_to_ui()
         self._connect_signals()
@@ -67,35 +45,25 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"{APP_NAME} v{APP_VERSION}")
         self.setMinimumSize(760, 560)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-
         if self._settings.window_x >= 0 and self._settings.window_y >= 0:
-            self.setGeometry(
-                self._settings.window_x,
-                self._settings.window_y,
-                self._settings.window_width,
-                self._settings.window_height,
-            )
+            self.setGeometry(self._settings.window_x, self._settings.window_y,
+                             self._settings.window_width, self._settings.window_height)
         else:
             self.resize(self._settings.window_width, self._settings.window_height)
-
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
         main_layout.setContentsMargins(12, 12, 12, 8)
         main_layout.setSpacing(10)
-
         header = QHBoxLayout()
         title = QLabel("FMM")
-        title.setStyleSheet(
-            f"font-size: 22px; font-weight: 800; color: {ACCENT}; letter-spacing: 1px;"
-        )
+        title.setStyleSheet(f"font-size: 22px; font-weight: 800; color: {ACCENT}; letter-spacing: 1px;")
         subtitle = QLabel("Forex Money Manager")
         subtitle.setStyleSheet(f"font-size: 14px; color: {TEXT_SECONDARY};")
         header.addWidget(title)
         header.addWidget(subtitle)
         header.addStretch()
         main_layout.addLayout(header)
-
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setHandleWidth(3)
         splitter.setChildrenCollapsible(False)
@@ -104,7 +72,6 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(0, 3)
         splitter.setStretchFactor(1, 2)
         main_layout.addWidget(splitter, stretch=1)
-
         self._status_bar = QStatusBar()
         self.setStatusBar(self._status_bar)
         self._status_bar.showMessage("Ready")
@@ -121,13 +88,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self._build_actions(), 0, Qt.AlignmentFlag.AlignBottom)
         return widget
 
-    def _new_spin(
-        self,
-        minimum: float,
-        maximum: float,
-        decimals: int,
-        step: float,
-    ) -> QDoubleSpinBox:
+    def _new_spin(self, minimum: float, maximum: float, decimals: int, step: float) -> QDoubleSpinBox:
         spin = QDoubleSpinBox()
         spin.setRange(minimum, maximum)
         spin.setDecimals(decimals)
@@ -140,19 +101,13 @@ class MainWindow(QMainWindow):
         grid = QGridLayout(group)
         grid.setSpacing(8)
         grid.setColumnStretch(1, 1)
-
         self._balance_spin = self._new_spin(0.01, 1_000_000_000, 2, 100)
         self._balance_spin.setPrefix("$ ")
         self._risk_spin = self._new_spin(0.01, 100, 2, 0.25)
         self._risk_spin.setSuffix(" %")
         self._risk_amount_label = QLabel("$ 0.00")
         self._risk_amount_label.setObjectName("resultValueRisk")
-
-        for row, label, control in (
-            (0, "Balance", self._balance_spin),
-            (1, "Risk %", self._risk_spin),
-            (2, "Risk Amount", self._risk_amount_label),
-        ):
+        for row, label, control in ((0, "Balance", self._balance_spin), (1, "Risk %", self._risk_spin), (2, "Risk Amount", self._risk_amount_label)):
             grid.addWidget(QLabel(label), row, 0)
             grid.addWidget(control, row, 1)
         return group
@@ -162,29 +117,16 @@ class MainWindow(QMainWindow):
         grid = QGridLayout(group)
         grid.setSpacing(8)
         grid.setColumnStretch(1, 1)
-
         self._pip_value_spin = self._new_spin(0.01, 100_000, 4, 0.5)
         self._pip_value_spin.setPrefix("$ ")
-        self._pip_value_spin.setToolTip(
-            "USD value of one pip for one standard lot.\n"
-            "Enter the exact value supplied by your broker for the instrument."
-        )
+        self._pip_value_spin.setToolTip("USD value of one pip for one standard lot.\nEnter the exact value supplied by your broker for the instrument.")
         self._sl_spin = self._new_spin(0.01, 99_999_999, 2, 1)
         self._sl_spin.setSuffix(" pips")
         self._sl_spin.setToolTip("Distance from entry to stop-loss in pips.")
         self._tp_spin = self._new_spin(0, 99_999_999, 2, 1)
         self._tp_spin.setSuffix(" pips")
-        self._tp_spin.setToolTip(
-            "Distance from entry to take-profit in pips.\n"
-            "Defaults to 2× stop-loss until you edit it."
-        )
-
-        rows = (
-            (0, "Pip Value / Lot", self._pip_value_spin),
-            (1, "Stop-Loss", self._sl_spin),
-            (2, "Take-Profit", self._tp_spin),
-        )
-        for row, label, control in rows:
+        self._tp_spin.setToolTip("Distance from entry to take-profit in pips.\nDefaults to 2× stop-loss until you edit it.")
+        for row, label, control in ((0, "Pip Value / Lot", self._pip_value_spin), (1, "Stop-Loss", self._sl_spin), (2, "Take-Profit", self._tp_spin)):
             grid.addWidget(QLabel(label), row, 0)
             grid.addWidget(control, row, 1)
         return group
@@ -196,7 +138,6 @@ class MainWindow(QMainWindow):
         grid = QGridLayout()
         grid.setSpacing(6)
         grid.setColumnStretch(1, 1)
-
         self._pos_size_label = QLabel("0.000000 lots")
         self._pos_size_label.setObjectName("resultValue")
         self._pip_value_label = QLabel("$ 0.00 / pip")
@@ -207,18 +148,10 @@ class MainWindow(QMainWindow):
         self._loss_label.setObjectName("resultValueRisk")
         self._profit_label = QLabel("—")
         self._profit_label.setObjectName("resultValueReward")
-
-        for row, label, value in (
-            (0, "Position Size", self._pos_size_label),
-            (1, "Pip Value", self._pip_value_label),
-            (2, "Risk / Reward", self._rr_label),
-            (3, "Potential Loss", self._loss_label),
-            (4, "Potential Profit", self._profit_label),
-        ):
+        for row, label, value in ((0, "Position Size", self._pos_size_label), (1, "Pip Value", self._pip_value_label), (2, "Risk / Reward", self._rr_label), (3, "Potential Loss", self._loss_label), (4, "Potential Profit", self._profit_label)):
             grid.addWidget(QLabel(label), row, 0)
             grid.addWidget(value, row, 1)
         layout.addLayout(grid)
-
         self._rr_bar = RiskRewardBar()
         layout.addWidget(self._rr_bar, 0, Qt.AlignmentFlag.AlignTop)
         return group
@@ -256,17 +189,14 @@ class MainWindow(QMainWindow):
         self._clear_history_btn.setObjectName("dangerButton")
         header.addWidget(self._clear_history_btn)
         layout.addLayout(header)
-
         self._history_table = QTableWidget()
         self._history_table.setColumnCount(7)
-        self._history_table.setHorizontalHeaderLabels(
-            ["#", "Balance", "Risk%", "Risk$", "SL", "TP", "Lots"]
-        )
+        self._history_table.setHorizontalHeaderLabels(["#", "Balance", "Risk%", "Risk$", "SL", "TP", "Lots"])
         header_view = self._history_table.horizontalHeader()
         header_view.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+        self._history_table.setColumnWidth(0, 48)
         for column in range(1, 7):
-            header_view.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
-        self._history_table.setColumnWidth(0, 36)
+            header_view.setSectionResizeMode(column, QHeaderView.ResizeMode.Stretch)
         self._history_table.verticalHeader().setVisible(False)
         self._history_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self._history_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -289,13 +219,7 @@ class MainWindow(QMainWindow):
 
     def _make_setup(self) -> TradeSetup:
         tp = self._tp_spin.value()
-        return TradeSetup(
-            balance=self._balance_spin.value(),
-            risk_percent=self._risk_spin.value(),
-            stop_loss_pips=self._sl_spin.value(),
-            pip_value_per_lot=self._pip_value_spin.value(),
-            take_profit_pips=tp if tp > 0 else None,
-        )
+        return TradeSetup(balance=self._balance_spin.value(), risk_percent=self._risk_spin.value(), stop_loss_pips=self._sl_spin.value(), pip_value_per_lot=self._pip_value_spin.value(), take_profit_pips=tp if tp > 0 else None)
 
     def _on_stop_loss_changed(self) -> None:
         if not self._tp_user_edited:
@@ -326,28 +250,16 @@ class MainWindow(QMainWindow):
             self._rr_label.setText(f"1 : {result.rr_ratio:.2f}")
             self._profit_label.setText(f"+$ {result.potential_profit:,.2f}")
             self._rr_bar.set_rr_ratio(result.rr_ratio)
-        self._status_bar.showMessage(
-            f"Position: {result.position_size:.6f} lots  ·  Risk: ${result.risk_amount:,.2f}"
-            + (f"  ·  R:R 1:{result.rr_ratio:.2f}" if result.rr_ratio else "")
-        )
+        self._status_bar.showMessage(f"Position: {result.position_size:.6f} lots  ·  Risk: ${result.risk_amount:,.2f}" + (f"  ·  R:R 1:{result.rr_ratio:.2f}" if result.rr_ratio else ""))
 
     def _show_errors(self, errors: list[str]) -> None:
-        for label in (
-            self._risk_amount_label,
-            self._pos_size_label,
-            self._pip_value_label,
-            self._rr_label,
-            self._loss_label,
-            self._profit_label,
-        ):
+        for label in (self._risk_amount_label, self._pos_size_label, self._pip_value_label, self._rr_label, self._loss_label, self._profit_label):
             label.setText("—")
         self._rr_bar.set_rr_ratio(None)
         self._status_bar.showMessage("⚠  " + "  |  ".join(errors))
 
     def _hide_errors(self) -> None:
-        self._pos_size_label.setStyleSheet(
-            f"font-size: 18px; font-weight: 700; color: {TEXT_PRIMARY};"
-        )
+        self._pos_size_label.setStyleSheet(f"font-size: 18px; font-weight: 700; color: {TEXT_PRIMARY};")
 
     def _add_to_history(self) -> None:
         setup = self._make_setup()
@@ -364,28 +276,12 @@ class MainWindow(QMainWindow):
         result, errors = compute_trade(setup)
         if errors:
             return
-        lines = [
-            "FMM – Trade Calculation",
-            "=" * 32,
-            f"Balance:        ${setup.balance:,.2f}",
-            f"Risk:           {setup.risk_percent:.2f}%",
-            f"Risk Amount:    ${result.risk_amount:,.2f}",
-            f"Pip Value/Lot:  ${setup.pip_value_per_lot:.4f}",
-            f"Stop-Loss:      {setup.stop_loss_pips:.2f} pips",
-        ]
+        lines = ["FMM – Trade Calculation", "=" * 32, f"Balance:        ${setup.balance:,.2f}", f"Risk:           {setup.risk_percent:.2f}%", f"Risk Amount:    ${result.risk_amount:,.2f}", f"Pip Value/Lot:  ${setup.pip_value_per_lot:.4f}", f"Stop-Loss:      {setup.stop_loss_pips:.2f} pips"]
         if setup.take_profit_pips:
             lines.append(f"Take-Profit:    {setup.take_profit_pips:.2f} pips")
-        lines += [
-            "-" * 32,
-            f"Position Size:  {result.position_size:.6f} lots",
-            f"Pip Value:      ${result.pip_value:.2f} / pip",
-            f"Potential Loss: ${result.potential_loss:,.2f}",
-        ]
+        lines += ["-" * 32, f"Position Size:  {result.position_size:.6f} lots", f"Pip Value:      ${result.pip_value:.2f} / pip", f"Potential Loss: ${result.potential_loss:,.2f}"]
         if result.rr_ratio is not None:
-            lines += [
-                f"R:R Ratio:      1 : {result.rr_ratio:.2f}",
-                f"Potential Gain: ${result.potential_profit:,.2f}",
-            ]
+            lines += [f"R:R Ratio:      1 : {result.rr_ratio:.2f}", f"Potential Gain: ${result.potential_profit:,.2f}"]
         QApplication.clipboard().setText("\n".join(lines))
         self._status_bar.showMessage("Results copied to clipboard.")
 
@@ -404,13 +300,7 @@ class MainWindow(QMainWindow):
     def _clear_history(self) -> None:
         if not self._history:
             return
-        reply = QMessageBox.question(
-            self,
-            APP_NAME,
-            "Remove all history entries?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
+        reply = QMessageBox.question(self, APP_NAME, "Remove all history entries?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             self._history.clear()
             self._storage.clear_history()
@@ -418,29 +308,14 @@ class MainWindow(QMainWindow):
             self._status_bar.showMessage("History cleared.")
 
     def _show_about(self) -> None:
-        QMessageBox.about(
-            self,
-            f"About {APP_NAME}",
-            f"<h2>{APP_NAME}</h2>"
-            f"<p>Version {APP_VERSION}</p>"
-            "<p>A simple position-sizing calculator built with Python and PySide6.</p>"
-            "<p>Created by Hesam Amani.</p>",
-        )
+        QMessageBox.about(self, f"About {APP_NAME}", f"<h2>{APP_NAME}</h2>" f"<p>Version {APP_VERSION}</p>" "<p>A simple position-sizing calculator built with Python and PySide6.</p>" "<p>Created by Hesam Amani.</p>")
 
     def _refresh_history_table(self) -> None:
         table = self._history_table
         table.setRowCount(len(self._history))
         for row, entry in enumerate(reversed(self._history)):
             s = entry.setup
-            values = (
-                str(len(self._history) - row),
-                f"${s.balance:,.0f}",
-                f"{s.risk_percent:.2f}%",
-                f"${entry.result.risk_amount:,.2f}",
-                f"{s.stop_loss_pips:.2f}",
-                f"{s.take_profit_pips:.2f}" if s.take_profit_pips else "—",
-                f"{entry.result.position_size:.6f}",
-            )
+            values = (str(len(self._history) - row), f"${s.balance:,.0f}", f"{s.risk_percent:.2f}%", f"${entry.result.risk_amount:,.2f}", f"{s.stop_loss_pips:.2f}", f"{s.take_profit_pips:.2f}" if s.take_profit_pips else "—", f"{entry.result.position_size:.6f}")
             for column, text in enumerate(values):
                 item = QTableWidgetItem(text)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
