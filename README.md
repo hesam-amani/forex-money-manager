@@ -106,6 +106,10 @@ The results panel shows the calculated lot size, pip value, R:R, and potential U
 ```text
 forex-money-manager/
 ├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md        # Bug report template
+│   │   ├── feature_request.md   # Feature request template
+│   │   └── config.yml            # Blank issues disabled
 │   └── workflows/
 │       └── tests.yml             # GitHub Actions test workflow
 ├── fmm/
@@ -128,6 +132,7 @@ forex-money-manager/
 ├── main.py                      # Application entry point
 ├── main-v3.cpp                  # Original C++ version/reference
 ├── requirements.txt
+├── CODE_OF_CONDUCT.md
 ├── LICENSE
 └── README.md
 ```
@@ -226,13 +231,17 @@ The current application is a Python/PySide6 rewrite with a deliberately smaller 
 
 ## 🤝 Contributing
 
-Issues and pull requests are welcome.
+Issues and pull requests are welcome. Please use the included issue and pull request templates when contributing. By participating in the project, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 For changes to the calculation engine, please add or update tests that cover the affected behavior. Keep broker-specific assumptions out of the core formulas unless the calculation model is intentionally expanded.
 
 ## 📄 License
 
 FMM is open-source software released under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgements
+
+- [Contributor Covenant](https://www.contributor-covenant.org/) for the Code of Conduct framework
 
 ---
 
