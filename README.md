@@ -1,48 +1,63 @@
-# FMM — Forex Money Manager
+# 💱 Forex Money Manager
 
-A small, offline desktop tool for calculating forex position size from the numbers that actually matter to the trade.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![PySide6](https://img.shields.io/badge/PySide6-Qt6-41CD52?logo=qt&logoColor=white)](https://doc.qt.io/qtforpython/)
+[![Tests](https://img.shields.io/badge/tests-22%20passing-2ea043)](#tests)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Built with **Python**, **PySide6**, and **pytest**.
+A lightweight desktop position-sizing calculator for forex traders.
 
-## Why the calculator asks for pip value
+FMM calculates **risk amount, pip value, position size, risk/reward, and potential profit/loss** from a small set of trade inputs. It is designed to keep the calculation transparent instead of trying to infer broker-specific contract details from a symbol or live market price.
 
-FMM deliberately does **not** try to guess an instrument's pip value from its symbol or current market price.
+## ✨ Features
 
-Broker contract specifications vary, especially outside straightforward USD-quoted pairs. Instead, enter the **USD value of one pip for one standard lot** exactly as provided by your broker.
+| Feature | Description |
+|---|---|
+| 🎯 **Position Sizing** | Calculate the required lot size from account balance, risk, stop-loss, and pip value |
+| 💵 **Risk Calculation** | See the exact USD amount being risked on the trade |
+| 📏 **Manual Pip Value** | Enter the USD value of one pip for one standard lot supplied by your broker |
+| ⚖️ **Risk / Reward** | Calculate TP-to-SL ratio automatically |
+| 📈 **R:R Visualisation** | A custom bar shows the loss/reward split, including extreme ratios |
+| 💰 **Potential Profit/Loss** | See the dollar outcome at the selected SL and TP |
+| 🔄 **Live Recalculation** | Results update immediately when an input changes |
+| 🎯 **Auto Take-Profit** | TP defaults to 2× SL and can be manually overridden |
+| 📝 **Calculation History** | Save and review recent calculations locally |
+| 📋 **Copy Results** | Copy a clean trade summary to the clipboard |
+| 💾 **Persistent Settings** | Inputs and window geometry are restored between sessions |
+| 🌙 **Dark Interface** | Compact Qt6 desktop UI with a dark theme |
+| 🔒 **Offline** | No market-data API, network connection, or account access is required |
 
-That makes the calculation simple, transparent, and broker-independent.
+## 🧮 How It Works
 
-## Inputs
+FMM intentionally asks for **Pip Value / Lot** instead of asking for an instrument and current market price.
 
-- **Balance** — account balance in USD.
-- **Risk %** — percentage of the balance you want to risk.
-- **Pip Value / Lot** — USD value of one pip for one standard lot, supplied by your broker.
-- **Stop-Loss** — stop distance in pips.
-- **Take-Profit** — optional target distance in pips. It defaults to 2× the stop-loss and can be overridden manually.
+Broker and instrument conventions can vary. Rather than making assumptions about contract size, quote currency, leverage, or current price, FMM uses the **USD value of one pip for one standard lot** that you provide from your broker's specifications.
 
-There is intentionally **no instrument selector and no current-price input**. FMM does not need either one to size the position once the broker's pip value is known.
-
-## Calculations
+Once that value is known, the position-sizing calculation is straightforward:
 
 ```text
 risk_amount   = balance × risk_percent / 100
 pip_value     = risk_amount / stop_loss_pips
 position_size = pip_value / pip_value_per_lot
+```
 
-risk_reward   = take_profit_pips / stop_loss_pips
-profit        = position_size × pip_value_per_lot × take_profit_pips
-loss          = risk_amount
+When a take-profit is set:
+
+```text
+risk_reward = take_profit_pips / stop_loss_pips
+profit      = position_size × pip_value_per_lot × take_profit_pips
+loss        = risk_amount
 ```
 
 ### Example
 
-With:
+Suppose the trade uses:
 
-- Balance: `$10,000`
-- Risk: `1%`
-- Pip Value / Lot: `$10`
-- Stop-Loss: `25 pips`
-- Take-Profit: `50 pips`
+- **Balance:** `$10,000`
+- **Risk:** `1%`
+- **Pip Value / Lot:** `$10`
+- **Stop-Loss:** `25 pips`
+- **Take-Profit:** `50 pips`
 
 FMM calculates:
 
@@ -51,94 +66,174 @@ Risk amount   = $100.00
 Pip value     = $4.00 / pip
 Position size = 0.400000 lots
 Risk / Reward = 1 : 2.00
-Potential loss = $100.00
-Potential gain = $200.00
+Potential loss  = $100.00
+Potential profit = $200.00
 ```
 
-## Features
+## 🎮 Usage
 
-- Live calculation as inputs change
-- Manual broker-supplied pip value
-- Automatic 2× SL take-profit with manual override
-- Risk/reward calculation
-- Potential profit/loss
-- Calculation history stored locally as JSON
-- Copy results to clipboard
-- Persistent input values and window geometry
-- Dark Qt6 interface
-- No internet connection or market-data API required
+### 1. Enter account and risk
 
-## Project Structure
+Set your account **Balance** and the percentage of the account you want to risk.
+
+### 2. Enter the broker's pip value
+
+Enter **Pip Value / Lot** as the USD value of one pip for one standard lot for the instrument you are trading.
+
+### 3. Set the stop-loss
+
+Enter the distance between entry and stop-loss in pips.
+
+### 4. Set the take-profit
+
+FMM initially sets TP to **2× the stop-loss**. Edit it whenever you want a different target; after a manual edit, changing SL will no longer overwrite your TP.
+
+### 5. Review the results
+
+The results panel shows the calculated lot size, pip value, R:R, and potential USD outcomes. You can add the calculation to history or copy the complete summary to the clipboard.
+
+## 🛠️ Tech Stack
+
+- **Python** — application and calculation logic
+- **PySide6 / Qt6** — desktop interface
+- **pytest** — automated tests
+- **JSON** — local settings and history persistence
+- **GitHub Actions** — continuous integration
+- **PyInstaller** — optional standalone executable packaging
+
+## 📁 Project Structure
 
 ```text
-.
-├── FMM.spec
-├── main.py
-├── main-v3.cpp              # Original C++ version/reference
-├── requirements.txt
+forex-money-manager/
+├── .github/
+│   └── workflows/
+│       └── tests.yml             # GitHub Actions test workflow
 ├── fmm/
 │   ├── config/
-│   │   └── settings.py      # Persistent application settings
+│   │   └── settings.py          # Persistent application settings
 │   ├── core/
-│   │   ├── calculator.py    # Pure position-sizing formulas
-│   │   ├── constants.py     # Defaults and application metadata
-│   │   ├── models.py        # Calculation data models
-│   │   └── validators.py    # Input validation
+│   │   ├── calculator.py        # Position-sizing formulas
+│   │   ├── constants.py         # Defaults and application metadata
+│   │   ├── models.py            # Trade and result data models
+│   │   └── validators.py        # Input validation
 │   ├── services/
-│   │   └── storage.py       # Local history persistence
+│   │   └── storage.py           # Local history persistence
 │   ├── tests/
-│   │   └── test_calculator.py
+│   │   └── test_calculator.py   # Calculation and settings tests
 │   └── ui/
-│       ├── main_window.py   # PySide6 interface
-│       ├── styles.py         # Dark theme
-│       └── widgets.py        # R:R visualization
+│       ├── main_window.py       # Main application window
+│       ├── styles.py             # Dark-theme QSS
+│       └── widgets.py            # Custom R:R visualisation
+├── FMM.spec                     # PyInstaller build specification
+├── main.py                      # Application entry point
+├── main-v3.cpp                  # Original C++ version/reference
+├── requirements.txt
+├── LICENSE
 └── README.md
 ```
 
-The calculation engine has no PySide6 dependency, so the formulas can be tested independently from the GUI.
+The calculation engine in `fmm/core/` does not depend on PySide6, so the financial formulas remain separate from the GUI.
 
-## Installation
+## 🚀 Getting Started
 
-Python 3.10+ is recommended.
+### Prerequisites
+
+- Python **3.10+**
+- pip
+- A desktop environment supported by Qt6
+
+### Run Locally
+
+Clone the repository and create a virtual environment:
 
 ```bash
-git clone git@github.com:hesam-amani/forex-money-manager.git
+git clone https://github.com/hesam-amani/forex-money-manager.git
 cd forex-money-manager
 
 python3 -m venv .venv
 source .venv/bin/activate
+
 python -m pip install -r requirements.txt
 ```
 
-## Run
+Start FMM:
+
+```bash
+./main.py
+```
+
+You can also run it with Python directly:
 
 ```bash
 python main.py
 ```
 
-## Test
+On Linux/macOS, the executable entry point uses the Python shebang in `main.py`.
+
+## 🧪 Tests
+
+Run the complete test suite with:
 
 ```bash
-python -m pytest -q
+pytest -q
 ```
 
-The repository also includes a GitHub Actions workflow that runs the test suite on pushes and pull requests.
+The project currently has **22 automated tests** covering the core formulas, complete trade calculations, extreme R:R values, validation behavior, and settings persistence.
 
-## Local data
+GitHub Actions runs the same pytest suite on pushes to the active development branches and on pull requests targeting `main`.
 
-FMM stores settings and history outside the repository:
+## 💾 Local Data
+
+FMM does not use a database or external service for normal operation.
+
+On Linux, application data is stored under:
 
 ```text
-~/.config/fmm/settings.json
-~/.config/fmm/history.json
+~/.config/fmm/
+├── settings.json
+└── history.json
 ```
 
-These files are local user data and are not required by the application source.
+The files contain only the application's local settings and saved calculation history. They are not part of the repository.
 
-## Original C++ version
+The history is capped at the most recent **100 entries**.
 
-`main-v3.cpp` is kept as a reference to the original console implementation that inspired the Python rewrite. The active application is the Python/PySide6 version.
+## 📦 Packaging
 
-## License
+`FMM.spec` contains a PyInstaller configuration for building a windowed executable named `FMM`.
 
-MIT
+For example, after installing PyInstaller:
+
+```bash
+pyinstaller FMM.spec
+```
+
+The generated build artifacts are ignored by Git.
+
+## ⚠️ Important Note
+
+FMM is a **position-sizing calculator**, not a broker connection, trading terminal, or market-data application.
+
+The accuracy of the result depends on entering the correct **USD pip value per standard lot** for the instrument and broker you are using. FMM does not fetch or verify that value for you.
+
+Always verify broker contract specifications before placing a trade.
+
+## 📜 History
+
+FMM began as a small C++ console calculator. `main-v3.cpp` is retained in the repository as the original implementation/reference.
+
+The current application is a Python/PySide6 rewrite with a deliberately smaller calculation model and a separation between the calculation engine, persistence layer, and GUI.
+
+## 🤝 Contributing
+
+Issues and pull requests are welcome.
+
+For changes to the calculation engine, please add or update tests that cover the affected behavior. Keep broker-specific assumptions out of the core formulas unless the calculation model is intentionally expanded.
+
+## 📄 License
+
+FMM is open-source software released under the [MIT License](LICENSE).
+
+---
+
+**FMM v1.1.0** · Built by Hesam Amani
