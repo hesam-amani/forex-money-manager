@@ -1,1 +1,1 @@
-"""Services: persistence, presets, etc."""
+"""Application services."""
