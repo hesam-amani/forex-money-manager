@@ -1,0 +1,1 @@
+"""FMM — Forex Money Manager"""
