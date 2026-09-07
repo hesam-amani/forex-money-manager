@@ -9,21 +9,14 @@ import pytest
 
 from fmm.config.settings import AppSettings
 from fmm.core.calculator import (
-    calculate_pip_value,
-    calculate_position_size,
-    calculate_potential_profit,
-    calculate_risk_amount,
-    calculate_rr_ratio,
-    compute_trade,
+    calculate_pip_value, calculate_position_size, calculate_potential_profit,
+    calculate_risk_amount, calculate_rr_ratio, compute_trade,
 )
 from fmm.core.models import TradeSetup
 
 
 class TestRiskAmount:
-    @pytest.mark.parametrize(
-        ("balance", "risk", "expected"),
-        [(10_000, 1, 100), (10_000, 2, 200), (50_000, 0.5, 250), (100, 5, 5)],
-    )
+    @pytest.mark.parametrize("balance, risk, expected", [(10_000, 1, 100), (10_000, 2, 200), (50_000, 0.5, 250), (100, 5, 5)])
     def test_calculation(self, balance: float, risk: float, expected: float) -> None:
         assert calculate_risk_amount(balance, risk) == expected
 
@@ -62,11 +55,16 @@ class TestComputeTrade:
         assert result.potential_loss == 100
 
     def test_different_broker_pip_values(self) -> None:
-        setup = TradeSetup(10_000, 1, 25, 7.5, 50)
-        result, errors = compute_trade(setup)
+        result, errors = compute_trade(TradeSetup(10_000, 1, 25, 7.5, 50))
         assert errors == []
         assert result.position_size == pytest.approx(0.533333, rel=1e-5)
         assert result.potential_profit == pytest.approx(200)
+
+    @pytest.mark.parametrize(("sl", "tp"), [(8000, 39), (8000, 40), (8000, 1), (1, 8000)])
+    def test_extreme_rr_keeps_full_precision_for_visualisation(self, sl: float, tp: float) -> None:
+        result, errors = compute_trade(TradeSetup(10_000, 1, sl, 10, tp))
+        assert errors == []
+        assert result.rr_ratio == pytest.approx(tp / sl)
 
     def test_no_take_profit(self) -> None:
         result, errors = compute_trade(TradeSetup(10_000, 1, 25, 10))
@@ -89,7 +87,6 @@ class TestComputeTrade:
 class TestSettings:
     def test_roundtrip(self) -> None:
         import fmm.config.settings as config
-
         with tempfile.TemporaryDirectory() as tmp:
             path = os.path.join(tmp, "settings.json")
             original = config.SETTINGS_FILE
