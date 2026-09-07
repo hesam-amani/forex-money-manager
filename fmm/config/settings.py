@@ -51,8 +51,8 @@ class AppSettings:
             settings.pip_value_per_lot = max(0.01, settings.pip_value_per_lot)
             if settings.take_profit_pips is not None:
                 settings.take_profit_pips = max(0.0, settings.take_profit_pips)
-            settings.window_width = max(860, settings.window_width)
-            settings.window_height = max(620, settings.window_height)
+            settings.window_width = max(760, settings.window_width)
+            settings.window_height = max(700, settings.window_height)
             return settings
         except (OSError, TypeError, ValueError, json.JSONDecodeError):
             return cls()

@@ -3,7 +3,14 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QPointF, QRectF, Qt  # pyright: ignore[reportMissingImports]
-from PySide6.QtGui import QBrush, QColor, QFont, QLinearGradient, QPainter, QPen  # pyright: ignore[reportMissingImports]
+from PySide6.QtGui import (  # pyright: ignore[reportMissingImports]
+    QBrush,
+    QColor,
+    QFont,
+    QLinearGradient,
+    QPainter,
+    QPen,
+)
 from PySide6.QtWidgets import QWidget  # pyright: ignore[reportMissingImports]
 
 from .styles import REWARD_GREEN, RISK_RED

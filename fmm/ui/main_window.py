@@ -2,25 +2,45 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from PySide6.QtCore import Qt  # pyright: ignore[reportMissingImports]
-from PySide6.QtWidgets import (
-    QApplication, QDoubleSpinBox, QFrame, QGridLayout, QGroupBox, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMessageBox, QPushButton, QSizePolicy,
-    QSplitter, QStatusBar, QTableWidget, QTableWidgetItem, QToolTip, QVBoxLayout,
+from PySide6.QtWidgets import (  # pyright: ignore[reportMissingImports]
+    QApplication,
+    QDoubleSpinBox,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QSizePolicy,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QToolTip,
+    QVBoxLayout,
     QWidget,
 )
 
 from ..config.settings import AppSettings
 from ..core.calculator import compute_trade
 from ..core.constants import (
-    APP_NAME, APP_VERSION, DEFAULT_BALANCE, DEFAULT_PIP_VALUE_PER_LOT,
-    DEFAULT_RISK_PCT, DEFAULT_STOP_LOSS_PIPS, DEFAULT_TAKE_PROFIT_PIPS,
+    APP_NAME,
+    APP_VERSION,
+    DEFAULT_BALANCE,
+    DEFAULT_PIP_VALUE_PER_LOT,
+    DEFAULT_RISK_PCT,
+    DEFAULT_STOP_LOSS_PIPS,
+    DEFAULT_TAKE_PROFIT_PIPS,
 )
 from ..core.models import HistoryEntry, TradeSetup
 from ..services.storage import StorageService
-from .styles import ACCENT, RISK_RED, TEXT_PRIMARY, TEXT_SECONDARY
+from .styles import ACCENT, TEXT_PRIMARY, TEXT_SECONDARY
 from .widgets import RiskRewardBar
 
 
@@ -43,7 +63,7 @@ class MainWindow(QMainWindow):
 
     def _build_ui(self) -> None:
         self.setWindowTitle(f"{APP_NAME} v{APP_VERSION}")
-        self.setMinimumSize(760, 560)
+        self.setMinimumSize(760, 700)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         if self._settings.window_x >= 0 and self._settings.window_y >= 0:
             self.setGeometry(self._settings.window_x, self._settings.window_y,
@@ -79,7 +99,7 @@ class MainWindow(QMainWindow):
     def _build_input_panel(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(12, 12, 12, 8)
         layout.setSpacing(10)
         layout.addWidget(self._build_account_group())
         layout.addWidget(self._build_trade_group())
@@ -266,7 +286,7 @@ class MainWindow(QMainWindow):
         result, errors = compute_trade(setup)
         if errors:
             return
-        self._history.append(HistoryEntry(datetime.now(), setup, result))
+        self._history.append(HistoryEntry(datetime.now(timezone.utc), setup, result))
         self._storage.save_history(self._history)
         self._refresh_history_table()
         self._status_bar.showMessage("Added to history.")
