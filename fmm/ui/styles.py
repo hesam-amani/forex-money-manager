@@ -2,25 +2,24 @@
 
 from __future__ import annotations
 
-# ── Colour palette ──────────────────────────────────────────────────────
-BG_DARK = "#0d1117"        # Deepest background
-BG_PANEL = "#161b22"       # Panel / card background
-BG_INPUT = "#0d1117"       # Input field background
-BG_INPUT_FOCUS = "#111820"  # Input field when focused
-BORDER = "#30363d"          # Default borders
-BORDER_FOCUS = "#58a6ff"    # Focus ring
-ACCENT = "#58a6ff"          # Primary accent (blue)
-ACCENT_HOVER = "#79c0ff"    # Accent hover
-RISK_RED = "#f85149"        # Risk / loss colour
-REWARD_GREEN = "#3fb950"    # Reward / profit colour
-TEXT_PRIMARY = "#e6edf3"    # Primary text
-TEXT_SECONDARY = "#8b949e"  # Muted / secondary text
-TEXT_DIM = "#484f58"        # Very dim text
-DANGER = "#f85149"          # Error / warning
-SUCCESS = "#3fb950"         # Success
+BG_DARK = "#0d1117"
+BG_PANEL = "#161b22"
+BG_INPUT = "#0d1117"
+BG_INPUT_FOCUS = "#111820"
+BG_TABLE_ALT = "#161b22"
+BORDER = "#30363d"
+BORDER_FOCUS = "#58a6ff"
+ACCENT = "#58a6ff"
+ACCENT_HOVER = "#79c0ff"
+RISK_RED = "#f85149"
+REWARD_GREEN = "#3fb950"
+TEXT_PRIMARY = "#e6edf3"
+TEXT_SECONDARY = "#8b949e"
+TEXT_DIM = "#484f58"
+DANGER = "#f85149"
+SUCCESS = "#3fb950"
 
 STYLESHEET = f"""
-/* ── Global ──────────────────────────────────────────────────────── */
 QWidget {{
     background-color: {BG_DARK};
     color: {TEXT_PRIMARY};
@@ -28,12 +27,10 @@ QWidget {{
     font-size: 13px;
 }}
 
-/* ── Main window ─────────────────────────────────────────────────── */
 QMainWindow {{
     background-color: {BG_DARK};
 }}
 
-/* ── Frames / Panels / Group Boxes ───────────────────────────────── */
 QFrame, QGroupBox {{
     background-color: {BG_PANEL};
     border: 1px solid {BORDER};
@@ -56,7 +53,6 @@ QGroupBox::title {{
     color: {TEXT_SECONDARY};
 }}
 
-/* ── Labels ──────────────────────────────────────────────────────── */
 QLabel {{
     background: transparent;
     border: none;
@@ -106,7 +102,6 @@ QLabel#dimLabel {{
     border: none;
 }}
 
-/* ── Line edits / Spin boxes ─────────────────────────────────────── */
 QLineEdit, QDoubleSpinBox, QSpinBox {{
     background-color: {BG_INPUT};
     color: {TEXT_PRIMARY};
@@ -145,7 +140,6 @@ QSpinBox::up-arrow, QSpinBox::down-arrow {{
     height: 8px;
 }}
 
-/* ── Combo box ───────────────────────────────────────────────────── */
 QComboBox {{
     background-color: {BG_INPUT};
     color: {TEXT_PRIMARY};
@@ -187,7 +181,6 @@ QComboBox QAbstractItemView {{
     padding: 4px;
 }}
 
-/* ── Buttons ─────────────────────────────────────────────────────── */
 QPushButton {{
     background-color: {ACCENT};
     color: {BG_DARK};
@@ -234,9 +227,9 @@ QPushButton#dangerButton:hover {{
     color: {BG_DARK};
 }}
 
-/* ── Tables ──────────────────────────────────────────────────────── */
 QTableWidget {{
     background-color: {BG_INPUT};
+    alternate-background-color: {BG_TABLE_ALT};
     color: {TEXT_PRIMARY};
     border: 1px solid {BORDER};
     border-radius: 6px;
@@ -247,6 +240,8 @@ QTableWidget {{
 }}
 
 QTableWidget::item {{
+    background-color: transparent;
+    color: {TEXT_PRIMARY};
     padding: 6px 10px;
     border: none;
 }}
@@ -265,14 +260,12 @@ QHeaderView::section {{
     padding: 8px 10px;
     font-weight: 600;
     font-size: 11px;
-    text-transform: uppercase;
 }}
 
 QHeaderView::section:last {{
     border-right: none;
 }}
 
-/* ── Scroll bars ─────────────────────────────────────────────────── */
 QScrollBar:vertical {{
     background: transparent;
     width: 8px;
@@ -317,7 +310,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
     width: 0px;
 }}
 
-/* ── Splitter ────────────────────────────────────────────────────── */
 QSplitter::handle {{
     background: {BORDER};
     width: 2px;
@@ -327,7 +319,6 @@ QSplitter::handle:hover {{
     background: {TEXT_DIM};
 }}
 
-/* ── Tooltips ────────────────────────────────────────────────────── */
 QToolTip {{
     background-color: {BG_PANEL};
     color: {TEXT_PRIMARY};
@@ -338,7 +329,6 @@ QToolTip {{
     font-weight: normal;
 }}
 
-/* ── Status bar ──────────────────────────────────────────────────── */
 QStatusBar {{
     background-color: {BG_PANEL};
     color: {TEXT_SECONDARY};
@@ -346,7 +336,6 @@ QStatusBar {{
     font-size: 11px;
 }}
 
-/* ── Menu bar (if used) ─────────────────────────────────────────── */
 QMenuBar {{
     background-color: {BG_PANEL};
     color: {TEXT_PRIMARY};
