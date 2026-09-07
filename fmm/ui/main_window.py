@@ -117,8 +117,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(self._build_account_group())
         layout.addWidget(self._build_trade_group())
         layout.addWidget(self._build_results_group())
-        layout.addWidget(self._build_actions())
-        layout.addStretch()
+        layout.addStretch(1)
+        layout.addWidget(self._build_actions(), 0, Qt.AlignmentFlag.AlignBottom)
         return widget
 
     def _new_spin(
@@ -192,6 +192,7 @@ class MainWindow(QMainWindow):
     def _build_results_group(self) -> QGroupBox:
         group = QGroupBox("RESULTS")
         layout = QVBoxLayout(group)
+        layout.setSpacing(8)
         grid = QGridLayout()
         grid.setSpacing(6)
         grid.setColumnStretch(1, 1)
@@ -219,13 +220,15 @@ class MainWindow(QMainWindow):
         layout.addLayout(grid)
 
         self._rr_bar = RiskRewardBar()
-        layout.addWidget(self._rr_bar)
+        layout.addWidget(self._rr_bar, 0, Qt.AlignmentFlag.AlignTop)
         return group
 
     def _build_actions(self) -> QWidget:
         widget = QWidget()
+        widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         layout = QHBoxLayout(widget)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
         self._add_btn = QPushButton("Add to History")
         self._copy_btn = QPushButton("Copy Results")
         self._copy_btn.setObjectName("secondaryButton")
@@ -241,8 +244,10 @@ class MainWindow(QMainWindow):
     def _build_history_panel(self) -> QFrame:
         frame = QFrame()
         layout = QVBoxLayout(frame)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setSpacing(8)
         header = QHBoxLayout()
+        header.setContentsMargins(2, 0, 2, 0)
         title = QLabel("History")
         title.setObjectName("sectionTitle")
         header.addWidget(title)
